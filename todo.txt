@@ -1,0 +1,5 @@
+
+2. embedding files loc
+3. combo file loc
+4. test generating embedding file okay or not
+5. write readme
