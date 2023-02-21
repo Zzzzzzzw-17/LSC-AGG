@@ -1,9 +1,7 @@
 adapter_transformers==3.1.0
 apex==0.9.10dev
-chinese_whispers==0.8.1
 datasets==2.6.1
 docopt==0.6.2
-faiss==1.5.3
 gensim==4.2.0
 matplotlib==3.6.2
 networkx==2.8.7
