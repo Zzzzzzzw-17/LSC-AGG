@@ -29,9 +29,9 @@ To calculate lexical semantic change of each target word, we use PRT and APD alg
 
 ## STEP 3: Evaluating with AUC and correlation
 To calculate AUC/correlation scores and evaluate them against gold standard, please run the following code in the command line 
-- AUC `python3 code/eval_classification.py <ModelAnsPath> <TrueAnsPath>` e.g. `code/eval_classification.py results/PRT/bert_base   test_data_truth/task1/english.txt`
+- AUC `python3 code/eval_classification.py <ModelAnsPath> <TrueAnsPath>` e.g. `code/eval_classification.py results/PRT/bert_base   test_data_truth/classification/english.txt`
 
-- Spearmann correlation `python3 code/eval_rank.py <ModelAnsPath> <TrueAnsPath>` e.g. ` python3 code/eval_ranking.py results/PRT/bert_base   test_data_truth/task2/english.txt`
+- Spearmann correlation `python3 code/eval_rank.py <ModelAnsPath> <TrueAnsPath>` e.g. ` python3 code/eval_ranking.py results/PRT/bert_base   test_data_truth/ranking/english.txt`
 
 ## Other details
 - The dataset can be downloaded here: https://www.ims.uni-stuttgart.de/en/research/resources/corpora/sem-eval-ulscd/

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from docopt import docopt
 import os
 import numpy as np
