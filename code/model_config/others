@@ -1,0 +1,1 @@
+For Histbert and local finetuned sst2 and pos models, please download the models and change the first argument of model config to the path of the model files.
