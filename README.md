@@ -37,12 +37,11 @@ To calculate lexical semantic change of each target word, we use PRT and APD alg
 
 ## STEP 3: Evaluating with AUC and correlation
 To calculate AUC/correlation scores and evaluate them against gold standard, please run the following code in the command line 
-- AUC `python3 code/eval_classification.py <ModelAnsPath> <TrueAnsPath>` e.g. `code/eval_classification.py results/PRT/bert_base   test_data_truth/task1/english.txt`
+- AUC `python3 code/eval_classification.py <ModelAnsPath> <TrueAnsPath>` e.g. `code/eval_classification.py results/PRT/bert_base   test_data_truth/classfication/english.txt`
 
-- Spearmann correlation `python3 code/eval_rank.py <ModelAnsPath> <TrueAnsPath>` e.g. ` python3 code/eval_ranking.py results/PRT/bert_base   test_data_truth/task2/english.txt`
+- Spearmann correlation `python3 code/eval_rank.py <ModelAnsPath> <TrueAnsPath>` e.g. ` python3 code/eval_ranking.py results/PRT/bert_base   test_data_truth/ranking/english.txt`
 
 ## Other details
-- The dataset can be downloaded here: https://www.ims.uni-stuttgart.de/en/research/resources/corpora/sem-eval-ulscd/
 - The lsc.ipynb contains plots for the paper, p-value generation and averaging best combinations.   
 - The above code are are adapted from https://github.com/akutuzov/semeval2020
 - The correlation scores of all possible combinations of models can be found here: https://1drv.ms/u/s!AhyFFULVgsQqjzucNHb7AL3PSXDv?e=qXLKXT
@@ -50,5 +49,6 @@ To calculate AUC/correlation scores and evaluate them against gold standard, ple
 
 ## References
 [1] Kutuzov, Andrey and Mario Giulianelli. “UiO-UvA at SemEval-2020 Task 1: Contextualised Embeddings for Lexical Semantic Change Detection.” International Workshop on Semantic Evaluation (2020).
+
 [2] Logan IV, Robert L et al. “Cutting Down on Prompts and Parameters: Simple Few-Shot Learning with Language Models.” Findings (2021).
 
