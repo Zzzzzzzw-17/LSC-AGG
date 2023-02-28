@@ -15,16 +15,16 @@ We follow [Kutuzov and Giulianellito](https://arxiv.org/abs/2005.00050) to use c
 - If you want to extract embeddings yourself, you can run the following commands: 
     - To extract token embeddings of bert-base model or any local fine-tuned models, run `python3 code/generate_embeddings_bert.py <PATH_TO_MODEL_CONFIG> <CORPUS> <TARGET_WORDS> <OUTFILE>` 
 
-         -  `<PATH_TO_MODEL_CONFIG>` is the path to the model config. The config specifies model name or (finetuned) model path, embedding size and desired last n layer(s) for extraction. In this paper, we simply extracted the embeddings from the top layer (n=1).
+         -  `<PATH_TO_MODEL_CONFIG>` is the path to the model config. The config specifies model name or (finetuned) model path, embedding size and desired last n layer(s) for extraction. In this paper, we simply extracted the embeddings from the top layer (n=1). All model configs can be found in `code/model_config`.
          -  `<CORPUS>` is the directory of the corpus. We use the English dataset from [SemEval-2020 Task 1: Unsupervised Lexical Semantic Change Detection](https://competitions.codalab.org/competitions/20948). It can be downloaded from [here]( https://www.ims.uni-stuttgart.de/en/research/resources/corpora/sem-eval-ulscd/).
          - ` <TARGET_WORDS>` is the path of desired words for detection. We use the default 37 words in SemEval-2020 Task 1. It can be found in the `data/target_nopos.txt` in this repo.
          -  `<OUTFILE>` is the path to store your embeddings files. 
-         - An example of usage can be: `python3 code/generate_embeddings_bert.py code/model_config  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz` (You need to download the corpus file and put them into the data file first.)
+         - An example of usage can be: `python3 code/generate_embeddings_bert.py code/model_config/bert_base  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz` (You need to download the corpus file and put them into the data file first.)
 
     - To extract token embeddings of adapter models, run `python3 code/generate_embeddings_adapter.py <PATH_TO_ADAPTER_CONFIG> <PATH_TO_MODEL_CONFIG> <CORPUS> <TARGET_WORDS> <OUTFILE>` 
-        - `<PATH_TO_ADAPTER_CONFIG>` is the path to the adapter config. The file specifies the adapter name and source. e.g. `AdapterHub/bert-base-uncased-pf-cola hf` (Please use the hf version of adapters in order to avoid loading errors).
+        - `<PATH_TO_ADAPTER_CONFIG>` is the path to the adapter config. The file specifies the adapter name and source. e.g. `AdapterHub/bert-base-uncased-pf-cola hf` (Please use the hf version of adapters in order to avoid loading errors). All adapter configs can be found in `code/adapter_config`.
         - ` <PATH_TO_MODEL_CONFIG>` is the same as describe above. You can also change the model to your own fine-tuned one by specifying the model path.  
-        - e.g. `python3 code/generate_embeddings_adapter.py code/adapter_config  code/model_config  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz`
+        - e.g. `python3 code/generate_embeddings_adapter.py code/adapter_config/nli  code/model_config/bert_base  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz`
 
     - These scripts produce `npz` archives containing numpy arrays with token embeddings for each target word in a given corpus.
 
