@@ -25,7 +25,7 @@ We follow [Kutuzov and Giulianellito](https://arxiv.org/abs/2005.00050) to use c
 To calculate lexical semantic change of each target word, we use PRT and APD algorithm from [Kutuzov and Giulianellito](https://arxiv.org/abs/2005.00050). The results of each fine-tuned models can be found in the` results` folder. To generate them, please run the following command: 
 - PRT algorithm: `python3 code/generate_prt_scores.py  --input0=PATH_TO_INPUT0 --input1=PATH_TO_INPUT1 --target=PATH_TO_TARGET_WORDS --output=OUTPUT_PATH` e.g. `python3 code/generate_prt_scores.py --input0=embeddings/corpus1/bert_base_output1.npz --input1=embeddings/corpus2/bert_base_output2.npz --target=data/target_nopos.txt --output=result` 
 
-- APD algorithm: `python3 code/generate_apd_scores.py  <PATH_TO_TARGET_WORDS>  <PATH_TO_INPUT1>  <PATH_TO_INPUT2>  <OUTPUT_PATH>`  e.g. ` python3 code/generate_apd_scores.py data/target_nopos.txt embeddings/corpus1/bert_base_output1.npz embeddings/corpus2/bert_base_outuput2.npz result` 
+- APD algorithm: `python3 code/generate_apd_scores.py  <PATH_TO_TARGET_WORDS>  <PATH_TO_INPUT1>  <PATH_TO_INPUT2>  <OUTPUT_PATH>`  e.g. ` python3 code/generate_apd_scores.py data/target_nopos.txt embeddings/corpus1/bert_base_output1.npz embeddings/corpus2/bert_base_output2.npz result` 
 
 ## STEP 3: Evaluating with AUC and correlation
 To calculate AUC/correlation scores and evaluate them against gold standard, please run the following code in the command line 
