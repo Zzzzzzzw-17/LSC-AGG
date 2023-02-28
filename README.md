@@ -1,4 +1,3 @@
-
 # Aggregating fine-tuned models to capture lexical semantic change
 
 This code accompanies the paper [The Finer they get: On aggregating fine-tuned models to capture lexical
@@ -12,26 +11,35 @@ We follow [Kutuzov and Giulianellito](https://arxiv.org/abs/2005.00050) to use c
 
 ##  STEP 1: Extracting token embeddings
 
-- You can use the embeddings extracted already [here](https://1drv.ms/u/s!AhyFFULVgsQqj3dqu4nah3dWWcD6?e=qiQ6Bo).
+- You can use the embeddings extracted already [here](https://1drv.ms/u/s!AhyFFULVgsQqj3hCZXco6rGCDiRl?e=pdJbg7).
 - If you want to extract embeddings yourself, you can run the following commands: 
-    - To extract token embeddings of bert-base model, run `python3 code/generate_embeddings_bert.py <PATH_TO_MODEL_CONFIG> <CORPUS> <TARGET_WORDS> <OUTFILE>` e.g.  `python3 code/generate_embeddings_bert.py code/model_config  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz` (You need to download the corpus file and put them into the data file first.)
+    - To extract token embeddings of bert-base model or any local fine-tuned models, run `python3 code/generate_embeddings_bert.py <PATH_TO_MODEL_CONFIG> <CORPUS> <TARGET_WORDS> <OUTFILE>` 
 
-    - To extract token embeddings of adapter models (finetuned), run `python3 code/generate_embeddings_adapter.py <PATH_TO_ADAPTER_CONFIG> <PATH_TO_MODEL_CONFIG> <CORPUS> <TARGET_WORDS> <OUTFILE>` e.g. `python3 code/generate_embeddings_adapter.py code/adapter_config  code/model_config  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz`
+         -  `<PATH_TO_MODEL_CONFIG>` is the path to the model config. The config specifies model name or (finetuned) model path, embedding size and desired last n layer(s) for extraction. In this paper, we simply extracted the embeddings from the top layer (n=1).
+         -  `<CORPUS>` is the directory of the corpus. We use the English dataset from [SemEval-2020 Task 1: Unsupervised Lexical Semantic Change Detection](https://competitions.codalab.org/competitions/20948). It can be downloaded from [here]( https://www.ims.uni-stuttgart.de/en/research/resources/corpora/sem-eval-ulscd/).
+         - ` <TARGET_WORDS>` is the path of desired words for detection. We use the default 37 words in SemEval-2020 Task 1. It can be found in the `data/target_nopos.txt` in this repo.
+         -  `<OUTFILE>` is the path to store your embeddings files. 
+         - An example of usage can be: `python3 code/generate_embeddings_bert.py code/model_config  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz` (You need to download the corpus file and put them into the data file first.)
+
+    - To extract token embeddings of adapter models, run `python3 code/generate_embeddings_adapter.py <PATH_TO_ADAPTER_CONFIG> <PATH_TO_MODEL_CONFIG> <CORPUS> <TARGET_WORDS> <OUTFILE>` 
+        - `<PATH_TO_ADAPTER_CONFIG>` is the path to the adapter config. The file specifies the adapter name and source. e.g. `AdapterHub/bert-base-uncased-pf-cola hf` (Please use the hf version of adapters in order to avoid loading errors).
+        - ` <PATH_TO_MODEL_CONFIG>` is the same as describe above. You can also change the model to your own fine-tuned one by specifying the model path.  
+        - e.g. `python3 code/generate_embeddings_adapter.py code/adapter_config  code/model_config  data/corpus1/token data/target_nopos.txt  embeddings/embeddings.npz`
 
     - These scripts produce `npz` archives containing numpy arrays with token embeddings for each target word in a given corpus.
 
 ##  STEP 2: Estimating semantic change
 
 To calculate lexical semantic change of each target word, we use PRT and APD algorithm from [Kutuzov and Giulianellito](https://arxiv.org/abs/2005.00050). The results of each fine-tuned models can be found in the` results` folder. To generate them, please run the following command: 
-- PRT algorithm: `python3 code/generate_prt_scores.py  --input0=PATH_TO_INPUT0 --input1=PATH_TO_INPUT1 --target=PATH_TO_TARGET_WORDS --output=OUTPUT_PATH` e.g. `python3 code/generate_prt_scores.py --input0=embeddings/corpus1/bert_base_output1.npz --input1=embeddings/corpus2/bert_base_output2.npz --target=data/target_nopos.txt --output=result` 
+- PRT algorithm: `python3 code/generate_prt_scores.py  <PATH_TO_TARGET_WORDS>  <PATH_TO_INPUT1>  <PATH_TO_INPUT2>  <OUTPUT_PATH>` e.g. `python3 code/generate_prt_scores.py  data/target_nopos.txt embeddings/output1.npz embeddings/output2.npz results` 
 
-- APD algorithm: `python3 code/generate_apd_scores.py  <PATH_TO_TARGET_WORDS>  <PATH_TO_INPUT1>  <PATH_TO_INPUT2>  <OUTPUT_PATH>`  e.g. ` python3 code/generate_apd_scores.py data/target_nopos.txt embeddings/corpus1/bert_base_output1.npz embeddings/corpus2/bert_base_output2.npz result` 
+- APD algorithm: `python3 code/generate_apd_scores.py  <PATH_TO_TARGET_WORDS>  <PATH_TO_INPUT1>  <PATH_TO_INPUT2>  <OUTPUT_PATH>`  e.g. ` python3 code/generate_apd_scores.py data/target_nopos.txt embeddings/output1.npz embeddings/output2.npz results` 
 
 ## STEP 3: Evaluating with AUC and correlation
 To calculate AUC/correlation scores and evaluate them against gold standard, please run the following code in the command line 
-- AUC `python3 code/eval_classification.py <ModelAnsPath> <TrueAnsPath>` e.g. `code/eval_classification.py results/PRT/bert_base   test_data_truth/classification/english.txt`
+- AUC `python3 code/eval_classification.py <ModelAnsPath> <TrueAnsPath>` e.g. `code/eval_classification.py results/PRT/bert_base   test_data_truth/task1/english.txt`
 
-- Spearmann correlation `python3 code/eval_rank.py <ModelAnsPath> <TrueAnsPath>` e.g. ` python3 code/eval_ranking.py results/PRT/bert_base   test_data_truth/ranking/english.txt`
+- Spearmann correlation `python3 code/eval_rank.py <ModelAnsPath> <TrueAnsPath>` e.g. ` python3 code/eval_ranking.py results/PRT/bert_base   test_data_truth/task2/english.txt`
 
 ## Other details
 - The dataset can be downloaded here: https://www.ims.uni-stuttgart.de/en/research/resources/corpora/sem-eval-ulscd/

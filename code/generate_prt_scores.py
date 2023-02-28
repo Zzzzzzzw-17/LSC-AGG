@@ -1,82 +1,113 @@
 # python3
 # coding: utf-8
-
+from docopt import docopt
 import numpy as np
-import argparse
+import pickle
 import logging
 from sklearn.decomposition import PCA
 from sklearn import preprocessing
 
+
 # Cosine similarity (COS) algorithm
 
-if __name__ == '__main__':
+def main():
+    """
+    Compute (diachronic) distance between sets of contextualised representations.
+    """
+
+    # Get the arguments
+    args = docopt("""Compute (diachronic) distance between sets of contextualised representations.
+
+    Usage:
+        distance.py [--metric=<d> --frequency] <testSet> <valueFile1> <valueFile2> <outPath>
+
+    Arguments:
+        <testSet> = path to file with one target per line
+        <valueFile1> = path to file containing usage matrices and snippets
+        <valueFile2> = path to file containing usage matrices and snippets
+        <outPath> = output path for result file
+
+    Options:
+        --metric=<d> how to aggregate embeddings if there are multiple layers speficied. 
+                     [default: mean]
+    """)
+
+    testset = args['<testSet>']
+    value_file1 = args['<valueFile1>']
+    value_file2 = args['<valueFile2>']
+    outpath = args['<outPath>']
+    mode = args['--metric']
+
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     logger = logging.getLogger(__name__)
+    # start_time = time.time()
 
-    parser = argparse.ArgumentParser()
-    arg = parser.add_argument
-    arg('--input0', '-i0', help='Path to 1st npz file with the embeddings', required=True)
-    arg('--input1', '-i1', help='Path to 2nd npz file with the embeddings', required=True)
-    arg('--target', '-t', help='Path to target words', required=True)
-    arg('--output', '-o', help='Output path (csv)', required=False)
-    arg('--mode', '-m', default='mean', choices=['mean', 'pca', 'sum'])
-    arg('-f', action='store_true', help='Output frequencies?')
+    # Load targets
+    targets = []
+    with open(testset, 'r', encoding='utf-8') as f_in:
+        for line in f_in.readlines():
+            target = line.strip()
+            targets.append(target)
 
-    args = parser.parse_args()
-    data_path0 = args.input0
-    data_path1 = args.input1
+    # Get usages collected from corpus 1
+    if value_file1.endswith('.dict'):
+        with open(value_file1, 'rb') as f_in:
+            usages1 = pickle.load(f_in)
+    elif value_file1.endswith('.npz'):
+        usages1 = np.load(value_file1)
+    else:
+        raise ValueError('valueFile 1: wrong format.')
 
-    target_words = set([w.strip() for w in open(args.target, 'r', encoding='utf-8').readlines()])
-
-    array0 = np.load(data_path0)
-    logger.info('Loaded an array of {0} entries from {1}'.format(len(array0), data_path0))
-
-    array1 = np.load(data_path1)
-    logger.info('Loaded an array of {0} entries from {1}'.format(len(array1), data_path1))
+    # Get usages collected from corpus 2
+    if value_file2.endswith('.dict'):
+        with open(value_file2, 'rb') as f_in:
+            usages2 = pickle.load(f_in)
+    elif value_file2.endswith('.npz'):
+        usages2 = np.load(value_file2)
+    else:
+        raise ValueError('valueFile 2: wrong format.')
 
     try:
-        f_out = open(args.output, 'w', encoding='utf-8')
+        f_out = open(outpath, 'w', encoding='utf-8')
     except TypeError:
         f_out = None
 
-    for word in target_words:
-        try: 
-            frequency = np.median([array0[word].shape[0], array1[word].shape[0]])
+    for word in targets:
+        try:
+            frequency = np.median([usages1[word].shape[0], usages2[word].shape[0]])
         except KeyError:
             print(word)
             continue
-        if array0[word].shape[0] < 3 or array1[word].shape[0] < 3:
+        if usages1[word].shape[0] < 3 or usages2[word].shape[0] < 3:
             logger.info('{} omitted because of low frequency'.format(word))
-            if args.f:
-                print('\t'.join([word, '10', str(frequency)]), file=f_out)
-            else:
-                print('\t'.join([word, '10']), file=f_out)
-            continue
-        vectors0 = array0[word]
-        vectors1 = array1[word]
+
+        vectors0 = usages1[word]
+        vectors1 = usages2[word]
         vectors = []
-        if args.mode == 'pca':
+        if mode == 'pca':
             for m in [vectors0, vectors1]:
                 scaled = (m - np.mean(m, 0)) / np.std(m, 0)
                 pca = PCA(n_components=3)
                 analysis = pca.fit(scaled)
                 vector = analysis.components_[0]
                 vectors.append(vector)
-        elif args.mode == 'mean':
+        elif mode == 'mean':
             for m in [vectors0, vectors1]:
                 vector = np.average(m, axis=0)
                 print("here", vector.shape)
                 vectors.append(vector)
-        elif args.mode == 'sum':
+        elif mode == 'sum':
             for m in [vectors0, vectors1]:
                 vector = np.sum(m, axis=0)
                 vectors.append(vector)
         vectors = [preprocessing.normalize(v.reshape(1, -1), norm='l2') for v in vectors]
         shift = 1 / np.dot(vectors[0].reshape(-1), vectors[1].reshape(-1))
-        if args.f:
-            print('\t'.join([word, str(shift), str(frequency)]), file=f_out)
-        else:
-            print('\t'.join([word, str(shift)]), file=f_out)
+
+        print('\t'.join([word, str(shift)]), file=f_out)
 
     if f_out:
         f_out.close()
+
+
+if __name__ == '__main__':
+    main()
